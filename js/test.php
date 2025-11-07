@@ -28,12 +28,12 @@
         }
         
     </script> */
-$data = [];
-while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-    $data[] = $row;
-}
+    $data = [];
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+        $data[] = $row;
+    }
 
-// On renvoie le tableau sous forme JSON
-echo json_encode($data);
+    // On renvoie le tableau sous forme JSON
+    echo json_encode($data);
 
 ?>
