@@ -14,6 +14,6 @@
 
          <button onclick="testButton_onClick()">Test</button>
 
-        <canvas id="mainCanvas" width="800" height="800" style="border:1px solid black;"></canvas>
+        <canvas id="mainCanvas" width="300" height="300" style="border:1px solid black;"></canvas>
     </body>
 </html>

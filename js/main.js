@@ -1,4 +1,4 @@
-const cellSize = 50;  // Size of cells in px
+const cellSize = 100;  // Size of cells in px
 var labyrinth = new Array();  // Contains a string, type of cell (empty, key...) add p to the string where the player is located
 
 var cellColor = 
@@ -7,7 +7,8 @@ var cellColor =
     "cle": "yellow",
     "depart": "green",
     "sortie": "blue",
-    "secret": "lightgray"
+    "secret": "lightgray",
+    "unknown": "black"
 };
 
 function playButton_onClick()
@@ -75,8 +76,95 @@ async function testButton_onClick()
         })
         .catch(error => console.error("Error: ", error));
 
+    /*
     placeCell(0,0, cellType[0]);
+    // TODO: voir pour le faire à la fin
     createLabyrinth(cellId, cellType, cell1, cell2, face1, face2, doorType, 1, 0, 0, -1);
+    */
+    var start = loadStart(cellId, cellType);
+
+    if (start == -1)
+    {
+        console.log("Error: starting point not found");
+        return;
+    }
+
+    drawCloseMaze(cellId, cellType, cell1, cell2, face1, face2, doorType, start);
+}
+
+
+function drawCloseMaze(IdArr, typeArr, cell1, cell2, face1, face2, doorType, playerId)
+{
+    // Place middle cell, player's pos
+    console.log("player" + playerId);
+    placeCell(1, 1, typeArr[playerId]);
+
+    // Setup visited's set
+    var visited = new Set();
+    visited.add(playerId);
+
+    for (let i = 0; i < cell1.length; i++)
+    {
+        // Cell isnt linked to player's
+        if (cell1[i] != playerId && cell2[i] != playerId)
+            continue;
+
+        var playerOn1 = cell1[i] == playerId;
+        console.log(playerOn1);
+        var currCell = playerOn1 ? cell1[i] : cell2[i];  // Other is player's cell
+        var face = !playerOn1 ? face1[i] : face2[i];  // Where the next cell is
+
+        if (checkVisited(visited, currCell))
+            continue;
+
+        visited.add(currCell);
+
+        var newX = 1;
+        var newY = 1;
+
+        switch (face)
+        {
+            case "N":
+                newY -= 1;
+                break;
+
+            case "S":
+                newY += 1;
+                break;
+
+            case "E":
+                newX += 1;
+                break;
+
+            case "W":
+            case "O":
+                newX -= 1;
+                break;
+        }
+
+        console.log("currcell " + currCell);
+        placeCell(newX, newY, typeArr[currCell]);
+    }
+}
+
+
+function playTurn()
+{
+
+}
+
+
+function loadStart(IdArr, typeArr)
+{
+    for (let i = 0; i < IdArr.length; i++)
+    {
+        if (typeArr[IdArr[i]] == "depart")
+        {
+            return IdArr[i];
+        }
+    }
+
+    return -1;
 }
 
 
@@ -185,11 +273,11 @@ function countOccurences(cellId, cell1, cell2)
 }
 
 
-function checkVisited(visited, currCell)
+function checkVisited(visited, value)
 {
     for (let i = 0; i < visited.length; i++)
     {
-        if (currCell = visited[i])
+        if (value == visited[i])
             return true;
     }
 
