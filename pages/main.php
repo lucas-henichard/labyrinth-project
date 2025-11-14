@@ -6,8 +6,7 @@
         <script src="../js/main.js"></script>
     </head>
 
-    <body onload="mainPhp_onLoad()">
-        <canvas id="mainCanvas" width="200" height="100" style="border:1px solid black;"></canvas>
+    <body>
     <?php // ../js/main.js
 	//Documentation php pour sqlite : https://www.php.net/manual/en/book.sqlite3.php
 	
