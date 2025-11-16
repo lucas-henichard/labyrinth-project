@@ -1,1 +1,2 @@
-*/db
+*.db
+database/database.php

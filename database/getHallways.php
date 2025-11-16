@@ -1,7 +1,7 @@
 <?php
     header('Content-Type: application/json; charset=utf-8');
 
-    $file_db .= "../database/labyrinthe.db";
+    $file_db = "../database/labyrinthe.db";
     $sqlite = new SQLite3(filename: $file_db);
         
     $sql = 'select couloir.id, couloir.type from couloir;';
