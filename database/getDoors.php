@@ -9,7 +9,8 @@
     $result = $sqlite->query($sql);
 
     $data = [];
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
+        {
         $data[] = $row;
     }
 

@@ -3,8 +3,18 @@
 
     $file_db = "../database/labyrinthe.db";
     $sqlite = new SQLite3(filename: $file_db);
-        
-    $sql = 'select * from passage where type = "grille";';  // TODO: change this to change a specific cell to empty, might be done in cell.php instead
+    
+    if (isset($_GET['id']))
+    {
+        $sql = 'update couloir set type="vide" where id=:id;'; 
+    }
+    else
+    {
+        // TODO: Raise error
+    }
 
-    $result = $sqlite->query($sql);  // Change this to only change the db but not return anything
+    $request = $sqlite -> prepare($sql);
+    $request -> bindValue(':id', $id, SQLITE3_INTEGER);
+
+    $result = $request -> execute();
 ?>

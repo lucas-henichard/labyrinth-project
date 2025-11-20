@@ -42,7 +42,7 @@ async function cell_onLoad(cellId, keyNb)
     if (cellType[playerCellId] == "cle")
     {
         keyAmnt++;
-        // TODO: remove key from cell in DB if done in js, either way it'll be done in php when entering cell
+        await removeCellFromDB(playerCellId);  // TODO: fix this not working
         console.log("You found a key! You now have " + keyAmnt + " keys."); 
     }
 
@@ -130,6 +130,7 @@ async function fetchSql()
 }
 
 
+// TODO: handle player rotation (only see in front of him and add a rotation button + player's facing in url)
 function drawCloseMaze(playerId)
 {
     console.log("Drawing from cell: " + playerId + " type: " + cellType[playerId]);
@@ -360,4 +361,16 @@ function movePlayer(direction)
 
     console.log("Moving to cell: " + newCellId);
     window.location.href = "cell.php?id=" + newCellId + "&keys=" + keyAmnt;
+}
+
+
+async function removeCellFromDB(id)
+{
+    await fetch("../database/changeCellToEmpty.php?id=" + id)
+        .then(response => 
+        {
+            if (!response.ok) return -1;
+            return 0;
+        })
+        .catch(error => console.error("Error: ", error));
 }
