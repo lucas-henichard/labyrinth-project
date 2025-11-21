@@ -6,7 +6,8 @@ var doorCells = new Map();
 var IdArr, cellType, cell1, cell2, face1, face2, doorType;
 var playerCellId = -1;
 var neiCells = new Map();
-
+var tknK = new Set();  // Keys alr taken
+var tknD = new Set();  // Doors alr taken
 
 const cellColor = 
 {
@@ -24,12 +25,27 @@ const doorColor =
 }
 
 
-async function cell_onLoad(cellId, keyNb)
+async function cell_onLoad(cellId, keyNb/*, tknKArr*/)
 {
     await fetchSql();
 
     playerCellId = cellId;
     keyAmnt = keyNb;
+    /*
+    if (tknK == undefined)
+    {
+        console.log("tknKArr = undefined");
+    }
+    
+    if (tknK.length == 0)
+        console.log("length is 0");
+
+    for (let i = 0; i < tknKArr.length; i++)
+    {
+        tknK.add(tknKArr[i]);
+        console.log(tknK);
+    }
+*/
 
     // If no cell specified, load start
     if (cellId == -1)
@@ -41,9 +57,19 @@ async function cell_onLoad(cellId, keyNb)
     
     if (cellType[playerCellId] == "cle")
     {
-        keyAmnt++;
-        await removeCellFromDB(playerCellId);  // TODO: fix this not working
-        console.log("You found a key! You now have " + keyAmnt + " keys."); 
+        if (!tknK.has(playerCellId))
+        {
+            keyAmnt++;
+            tknK.add(playerCellId);
+            
+            //await removeCellFromDB(playerCellId)  // TODO: fix this not working
+            console.log("You found a key! You now have " + keyAmnt + " keys."); 
+            for (let i = 0; i < tknK.length; i++)
+            {
+                console.log("tknK" + i + ": " + tknK[i]);
+            }
+            console.log("tknK[0] " + tknK[0]);
+        }
     }
 
     if (cellType[playerCellId] == "sortie")
@@ -74,7 +100,7 @@ async function fetchSql()
         })
         .then(data => 
         {
-            console.log("Réponse SQL :", data);
+            console.log("couloirs: ", data);
             
             // loop through result
             for (let i = 0; i < data.length; i++)
@@ -95,7 +121,7 @@ async function fetchSql()
         })
         .then(data =>
         {
-            console.log("SQL answer!", data);
+            console.log("passages: ", data);
 
             // loop through result
             for (let i = 0; i < data.length; i++)
@@ -117,7 +143,7 @@ async function fetchSql()
         })
         .then(data =>
         {
-            console.log("SQL answer!", data);
+            console.log("Grilles: ", data);
 
             // loop through result
             for (let i = 0; i < data.length; i++)
@@ -133,7 +159,6 @@ async function fetchSql()
 // TODO: handle player rotation (only see in front of him and add a rotation button + player's facing in url)
 function drawCloseMaze(playerId)
 {
-    console.log("Drawing from cell: " + playerId + " type: " + cellType[playerId]);
     // Place middle cell, player's pos
     placeCell(1, 1, cellType[playerId]);
 
@@ -188,7 +213,6 @@ function drawCloseMaze(playerId)
                 neiCells.set(face, currCell);
         }
 
-        console.log("currcell " + currCell);
         placeCell(newX, newY, cellType[currCell]);
         drawEdge(newX, newY, i, face);
     }
@@ -298,11 +322,32 @@ function getKeyAmntFromUrl()
 }
 
 
+function getTknKAmntFromUrl()
+{
+    const params = new URLSearchParams(window.location.search);
+    const tknKparam = params.get('tknK');
+    var res = new Array();
+    //console.log("get tknK: " + tknKparam);
+    if (tknKparam == null)
+        return new Set();
+    else 
+    {
+        for (let i = 0; i < tknKparam.length; i++)
+        {
+            res.push(tknKparam[i]);
+        }
+    }
+
+    return res;
+}
+
 window.addEventListener('DOMContentLoaded', () => 
 {
-    const cellId = getCellIdFromUrl();
-    const keyNb = getKeyAmntFromUrl();
-    cell_onLoad(cellId, keyNb);
+    const cellId = parseInt(localStorage.getItem("id"));//getCellIdFromUrl();
+    const keyNb = parseInt(localStorage.getItem("key")); //getKeyAmntFromUrl();
+    //const tknKp = localStorage.getItem("takenKeys").split(" "); //getTknKAmntFromUrl();
+
+    cell_onLoad(cellId, keyNb/*, tknKp*/);
 });
 
 
@@ -350,6 +395,7 @@ function movePlayer(direction)
             console.log("Used a key to open the door. Keys left: " + keyAmnt);
             doorCells.delete(playerCellId);
             doorCells.delete(newCellId);
+            tknD.add(playerCellId);
             // TODO: update DB to mark door as opened
         }
         else
@@ -359,18 +405,12 @@ function movePlayer(direction)
         }
     }
 
-    console.log("Moving to cell: " + newCellId);
-    window.location.href = "cell.php?id=" + newCellId + "&keys=" + keyAmnt;
-}
 
+    var pageHref = "cell.php?id=" + newCellId + "&keys=" + keyAmnt + "&tknK=" + Array.from(tknK).join(',');
+    console.log(Array.from(tknK).join(','));
+    localStorage.setItem("id", newCellId.toString());
+    localStorage.setItem("keys", keyAmnt.toString());
+    localStorage.setItem("takenKeys", tknK.join(','));
 
-async function removeCellFromDB(id)
-{
-    await fetch("../database/changeCellToEmpty.php?id=" + id)
-        .then(response => 
-        {
-            if (!response.ok) return -1;
-            return 0;
-        })
-        .catch(error => console.error("Error: ", error));
+    window.location.href = pageHref;
 }
