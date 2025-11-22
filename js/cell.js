@@ -17,7 +17,6 @@ const cellColor =
     "sortie": "blue",
 };
 
-
 const doorColor = 
 {
     "libre": "lightgray",
@@ -25,33 +24,17 @@ const doorColor =
 }
 
 
-async function cell_onLoad(cellId, keyNb/*, tknKArr*/)
+async function cell_onLoad()
 {
     await fetchSql();
 
+    /*
     playerCellId = cellId;
     keyAmnt = keyNb;
-    /*
-    if (tknK == undefined)
-    {
-        console.log("tknKArr = undefined");
-    }
-    
-    if (tknK.length == 0)
-        console.log("length is 0");
-
-    for (let i = 0; i < tknKArr.length; i++)
-    {
-        tknK.add(tknKArr[i]);
-        console.log(tknK);
-    }
 */
-
     // If no cell specified, load start
-    if (cellId == -1)
-    {
+    if (playerCellId == -1)
         playerCellId = loadStart();
-    }
     
     drawCloseMaze(playerCellId);
     
@@ -62,13 +45,16 @@ async function cell_onLoad(cellId, keyNb/*, tknKArr*/)
             keyAmnt++;
             tknK.add(playerCellId);
             
-            //await removeCellFromDB(playerCellId)  // TODO: fix this not working
             console.log("You found a key! You now have " + keyAmnt + " keys."); 
             for (let i = 0; i < tknK.length; i++)
             {
                 console.log("tknK" + i + ": " + tknK[i]);
             }
             console.log("tknK[0] " + tknK[0]);
+        }
+        else
+        {
+            console.log("You alr took this key earlier, you have " + keyAmnt + " keys.");
         }
     }
 
@@ -213,7 +199,14 @@ function drawCloseMaze(playerId)
                 neiCells.set(face, currCell);
         }
 
-        placeCell(newX, newY, cellType[currCell]);
+        if (cellType[currCell] == "cle" && tknK.has(currCell))
+        {
+            placeCell(newX, newY, "vide");
+        }
+        else
+        {
+            placeCell(newX, newY, cellType[currCell]);
+        }
         drawEdge(newX, newY, i, face);
     }
 
@@ -241,7 +234,17 @@ function drawEdge(x, y, doorId, face)
     const canvas = document.getElementById("cellCanvas");
     const ctx = canvas.getContext("2d");
 
-    ctx.strokeStyle = doorColor[doorType[doorId]];
+    // Vérifier si la porte est déjà ouverte
+    let cellA = cell1[doorId];
+    let cellB = cell2[doorId];
+    if (tknD.has(cellA) || tknD.has(cellB)) 
+    {
+        ctx.strokeStyle = doorColor["libre"];  // gris
+    } else 
+    {
+        ctx.strokeStyle = doorColor[doorType[doorId]];  // couleur normale
+    }
+
     ctx.lineWidth = 4;
 
     ctx.beginPath();
@@ -254,36 +257,21 @@ function drawEdge(x, y, doorId, face)
 
     switch (face)
     {
-        case "N":
-            endY += cellSize;
-            break;
-        case "S":
-            startY += cellSize;
-            break;
-        case "E":
-            startX += cellSize;
-            break;
+        case "N": 
+            endY += cellSize; break;
+        case "S": 
+            startY += cellSize; break;
+        case "E": 
+            startX += cellSize; break;
         case "W":
-        case "O":
-            endX += cellSize;
-            break;
-        case "C":
-            return;  // no edge for a secret passage
+        case "O": 
+            endX += cellSize; break;
+        case "C": 
+            return;  // no edge for secret passage
     }
 
-    // Adjust so the door is on the edge
-    if (x == 1) 
-    {
-        // horizontal
-        startY = startY;
-        endY   = endY - cellSize;
-    }
-    if (y == 1) 
-    {
-        // vertical
-        startX = startX;
-        endX   = endX - cellSize;
-    }
+    if (x == 1) { endY -= cellSize; }
+    if (y == 1) { endX -= cellSize; }
 
     ctx.moveTo(startX, startY);
     ctx.lineTo(endX, endY);
@@ -306,53 +294,39 @@ function loadStart()
 }
 
 
-function getCellIdFromUrl() 
+window.addEventListener('DOMContentLoaded', async () => 
 {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    return id !== null ? parseInt(id) : -1;  // -1 if not present (should be start cell)
-}
+    playerCellId = parseInt(localStorage.getItem("id"));
+    if (isNaN(playerCellId)) playerCellId = -1;
 
+    keyAmnt = parseInt(localStorage.getItem("keys"));
+    if (isNaN(keyAmnt)) keyAmnt = 0;
 
-function getKeyAmntFromUrl()
-{
-    const params = new URLSearchParams(window.location.search);
-    const keys = params.get('keys');
-    return keys !== null ? parseInt(keys) : 0;
-}
-
-
-function getTknKAmntFromUrl()
-{
-    const params = new URLSearchParams(window.location.search);
-    const tknKparam = params.get('tknK');
-    var res = new Array();
-    //console.log("get tknK: " + tknKparam);
-    if (tknKparam == null)
-        return new Set();
-    else 
+    tknK.clear();
+    const tknKStr = localStorage.getItem("takenKeys");
+    if (tknKStr && tknKStr.length > 0)
     {
-        for (let i = 0; i < tknKparam.length; i++)
+        tknKStr.split(',').forEach(id => 
         {
-            res.push(tknKparam[i]);
-        }
+            if (id !== '') tknK.add(parseInt(id));
+        });
     }
 
-    return res;
-}
+    tknD.clear();
+    const tknDStr = localStorage.getItem("takenDoors");
+    if (tknDStr && tknDStr.length > 0)
+    {
+        tknDStr.split(',').forEach(id => 
+        {
+            if (id !== '') tknD.add(parseInt(id));
+        });
+    }
 
-window.addEventListener('DOMContentLoaded', () => 
-{
-    const cellId = parseInt(localStorage.getItem("id"));//getCellIdFromUrl();
-    const keyNb = parseInt(localStorage.getItem("key")); //getKeyAmntFromUrl();
-    //const tknKp = localStorage.getItem("takenKeys").split(" "); //getTknKAmntFromUrl();
-
-    cell_onLoad(cellId, keyNb/*, tknKp*/);
+    await cell_onLoad();
 });
 
 
 //////////////// Movement ////////////////
-
 window.addEventListener('keydown', (event) =>
 {
     switch(event.key.toLowerCase())
@@ -372,6 +346,11 @@ window.addEventListener('keydown', (event) =>
         case " ":
             movePlayer("C");
             break;
+        case "r":
+            localStorage.clear();
+            localStorage.setItem("id", playerCellId.toString());
+            window.location.href = "cell.php";
+            break;
     }
 });
 
@@ -387,30 +366,38 @@ function movePlayer(direction)
     const newCellId = neiCells.get(direction);
 
     // Check for door before moving
-    if (doorCells.has(playerCellId) && doorCells.get(playerCellId) == newCellId)
+    if (doorCells.has(playerCellId) && doorCells.get(playerCellId) === newCellId) 
     {
-        if (keyAmnt > 0)
+        // if door is closed
+        if (!tknD.has(playerCellId) && !tknD.has(newCellId)) 
         {
-            keyAmnt--;
-            console.log("Used a key to open the door. Keys left: " + keyAmnt);
-            doorCells.delete(playerCellId);
-            doorCells.delete(newCellId);
-            tknD.add(playerCellId);
-            // TODO: update DB to mark door as opened
-        }
-        else
+            if (keyAmnt > 0)
+            {
+                keyAmnt--;
+                console.log("Used a key to open the door. Keys left: " + keyAmnt);
+
+                // Remove door (unlock)
+                doorCells.delete(playerCellId);
+                doorCells.delete(newCellId);
+                tknD.add(playerCellId);
+            } 
+            else  // Door is locked and no keys
+            {
+                console.log("Door is locked! You need a key to open it.");
+                return;
+            }
+        } 
+        else  // Door already opened
         {
-            console.log("Door is locked! You need a key to open it.");
-            return;
+            console.log("Door already opened, passing through.");
         }
     }
 
+    // Save new state to localStorage
+    localStorage.setItem("id", newCellId.toString());                    // new player position
+    localStorage.setItem("keys", keyAmnt.toString());                    // keys amount
+    localStorage.setItem("takenKeys", Array.from(tknK).join(','));       // collected keys
+    localStorage.setItem("takenDoors", Array.from(tknD).join(','));      // opened doors 
 
-    var pageHref = "cell.php?id=" + newCellId + "&keys=" + keyAmnt + "&tknK=" + Array.from(tknK).join(',');
-    console.log(Array.from(tknK).join(','));
-    localStorage.setItem("id", newCellId.toString());
-    localStorage.setItem("keys", keyAmnt.toString());
-    localStorage.setItem("takenKeys", tknK.join(','));
-
-    window.location.href = pageHref;
+    window.location.href = "cell.php";
 }
