@@ -1,5 +1,5 @@
 import { playerCellId, keyAmnt, doorCells, IdArr, cellType, cell1, cell2, face1, face2, doorType, cellColor,
-    doorColor, fetchSql, setKeyAmnt, setPlayerCellId, tknK , tknD, cellSize, neiCells
+    doorColor, fetchSql, setKeyAmnt, setPlayerCellId, tknK , tknD, cellSize, neiCells, setFace, face, refreshNeiCells
  } from "./mazeData.js";
 
 
@@ -7,16 +7,21 @@ async function cell_onLoad()
 {
     await fetchSql();
 
-    /*
-    playerCellId = cellId;
-    keyAmnt = keyNb;
-*/
     // If no cell specified, load start
     if (playerCellId == -1)
         playerCellId = loadStart();
+
+    if (face == undefined)
+        setFace("N");
     
-    drawCloseMaze(playerCellId);
+    drawInFront();
+    //drawCloseMaze(playerCellId);
     
+    for (var elt of neiCells)
+    {
+        console.log(elt);
+    }
+
     if (cellType[playerCellId] == "cle")
     {
         if (!tknK.has(playerCellId))
@@ -44,6 +49,55 @@ async function cell_onLoad()
 }
 
 
+function loadStart()
+{
+    for (let i = 0; i < IdArr.length; i++)
+    {
+        if (cellType[IdArr[i]] == "depart")
+        {
+            return IdArr[i];
+        }
+    }
+
+    return -1;
+}
+
+
+window.addEventListener('DOMContentLoaded', async () => 
+{
+    setPlayerCellId(parseInt(localStorage.getItem("id")));
+    if (isNaN(playerCellId)) setPlayerCellId(-1);
+
+    setKeyAmnt(parseInt(localStorage.getItem("keys")));
+    if (isNaN(keyAmnt)) setKeyAmnt(0);
+
+    tknK.clear();
+    const tknKStr = localStorage.getItem("takenKeys");
+    if (tknKStr && tknKStr.length > 0)
+    {
+        tknKStr.split(',').forEach(id => 
+        {
+            if (id !== '') tknK.add(parseInt(id));
+        });
+    }
+
+    tknD.clear();
+    const tknDStr = localStorage.getItem("takenDoors");
+    if (tknDStr && tknDStr.length > 0)
+    {
+        tknDStr.split(',').forEach(id => 
+        {
+            if (id !== '') tknD.add(parseInt(id));
+        });
+    }
+
+    setFace(localStorage.getItem("face"));
+
+    await cell_onLoad();
+});
+
+
+//////////////////////  DRAWINGS  //////////////////////
 // TODO: handle player rotation (only see in front of him and add a rotation button + player's facing in url)
 function drawCloseMaze(playerId)
 {
@@ -136,15 +190,16 @@ function drawEdge(x, y, doorId, face)
     const canvas = document.getElementById("cellCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Vérifier si la porte est déjà ouverte
+    // Check if the door was alr opened
     let cellA = cell1[doorId];
     let cellB = cell2[doorId];
     if (tknD.has(cellA) || tknD.has(cellB)) 
     {
-        ctx.strokeStyle = doorColor["libre"];  // gris
-    } else 
+        ctx.strokeStyle = doorColor["libre"];
+    } 
+    else 
     {
-        ctx.strokeStyle = doorColor[doorType[doorId]];  // couleur normale
+        ctx.strokeStyle = doorColor[doorType[doorId]];
     }
 
     ctx.lineWidth = 4;
@@ -160,20 +215,32 @@ function drawEdge(x, y, doorId, face)
     switch (face)
     {
         case "N": 
-            endY += cellSize; break;
+            endY += cellSize;
+             break;
         case "S": 
-            startY += cellSize; break;
+            startY += cellSize;
+             break;
         case "E": 
-            startX += cellSize; break;
+            startX += cellSize;
+             break;
         case "W":
         case "O": 
-            endX += cellSize; break;
+            endX += cellSize;
+             break;
         case "C": 
             return;  // no edge for secret passage
     }
 
-    if (x == 1) { endY -= cellSize; }
-    if (y == 1) { endX -= cellSize; }
+    if (x == 1) 
+    { 
+        endY -= cellSize; 
+
+    }
+
+    if (y == 1) 
+    { 
+        endX -= cellSize;
+    }
 
     ctx.moveTo(startX, startY);
     ctx.lineTo(endX, endY);
@@ -182,47 +249,14 @@ function drawEdge(x, y, doorId, face)
 }
 
 
-function loadStart()
+export function drawInFront()
 {
-    for (let i = 0; i < IdArr.length; i++)
-    {
-        if (cellType[IdArr[i]] == "depart")
-        {
-            return IdArr[i];
-        }
-    }
+    const canvas = document.getElementById("cellCanvas");
+    const ctx = canvas.getContext("2d");
 
-    return -1;
+    refreshNeiCells();
+    
+    let facedId = neiCells.get(face);
+    ctx.fillStyle = cellColor[cellType[facedId]];
+    ctx.fillRect(0, 0, 300, 300);
 }
-
-
-window.addEventListener('DOMContentLoaded', async () => 
-{
-    setPlayerCellId(parseInt(localStorage.getItem("id")));
-    if (isNaN(playerCellId)) setPlayerCellId(-1);
-
-    setKeyAmnt(parseInt(localStorage.getItem("keys")));
-    if (isNaN(keyAmnt)) setKeyAmnt(0);
-
-    tknK.clear();
-    const tknKStr = localStorage.getItem("takenKeys");
-    if (tknKStr && tknKStr.length > 0)
-    {
-        tknKStr.split(',').forEach(id => 
-        {
-            if (id !== '') tknK.add(parseInt(id));
-        });
-    }
-
-    tknD.clear();
-    const tknDStr = localStorage.getItem("takenDoors");
-    if (tknDStr && tknDStr.length > 0)
-    {
-        tknDStr.split(',').forEach(id => 
-        {
-            if (id !== '') tknD.add(parseInt(id));
-        });
-    }
-
-    await cell_onLoad();
-});

@@ -1,20 +1,31 @@
-import {neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD, setKeyAmnt} from "./mazeData.js";
+import {neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD, setKeyAmnt, face, setFace} from "./mazeData.js";
+import {drawInFront} from "./mainCell.js";
+
+var faces = ["O", "N", "E", "S"];
+
 
 window.addEventListener('keydown', (event) =>
 {
     switch(event.key.toLowerCase())
     {
         case 'z':
-            movePlayer("N");
+            movePlayer(face);
             break;
         case 's':
-            movePlayer("S");
+            // TODO: delete
+            //movePlayer("S");
             break;
         case 'd':
-            movePlayer("E");
+            //movePlayer("E");
+            setFace(faces[(faces.indexOf(face) + 1) % 4])
+            console.log(face);
             break;
         case 'q':
-            movePlayer("O");
+            //movePlayer("O");
+            setFace(faces[(faces.indexOf(face) - 1) % 4])
+            if (face == undefined)
+                setFace("S");
+            console.log(face);
             break;
         case " ":
             movePlayer("C");
@@ -24,7 +35,14 @@ window.addEventListener('keydown', (event) =>
             localStorage.setItem("id", playerCellId.toString());
             window.location.href = "cell.php";
             break;
+        case "t":
+            localStorage.clear();
+            localStorage.setItem("id", "13");
+            window.location.href = "cell.php";
+            break;
     }
+
+    drawInFront();
 });
 
 
@@ -71,6 +89,7 @@ export function movePlayer(direction)
     localStorage.setItem("keys", keyAmnt.toString());                    // keys amount
     localStorage.setItem("takenKeys", Array.from(tknK).join(','));       // collected keys
     localStorage.setItem("takenDoors", Array.from(tknD).join(','));      // opened doors 
+    localStorage.setItem("face", face);                                  // faced direction
 
     window.location.href = "cell.php";
 }

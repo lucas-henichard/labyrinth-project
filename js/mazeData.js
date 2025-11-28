@@ -2,6 +2,7 @@ export const cellSize = 100;
 
 export var keyAmnt = 0;
 export var doorCells = new Map();
+export var face = "N";
 
 export var IdArr, cellType, cell1, cell2, face1, face2, doorType;
 export var playerCellId = -1;
@@ -15,6 +16,7 @@ export const cellColor =
     "cle": "yellow",
     "depart": "green",
     "sortie": "blue",
+    "undefined": "black"
 };
 
 export const doorColor = 
@@ -80,7 +82,7 @@ export async function fetchSql()
         })
         .catch(error => console.error("Error: ", error));
 
-        await fetch("../database/getClosedDoors.php")
+    await fetch("../database/getClosedDoors.php")
         .then(response => 
         {
             if (!response.ok) throw new Error ("Network error");
@@ -110,4 +112,29 @@ export function setPlayerCellId(id)
 export function setKeyAmnt(amnt)
 {
     keyAmnt = amnt;
+}
+
+
+export function setFace(newFace)
+{
+    face = newFace;
+}
+
+
+export function refreshNeiCells()
+{
+    neiCells.clear();
+
+    for (let i = 0; i < cell1.length; i++)
+    {
+        // Cell isnt linked to player's
+        if (cell1[i] != playerCellId && cell2[i] != playerCellId)
+            continue;
+    
+        var playerOn1 = cell1[i] == playerCellId;
+        var currCell = playerOn1 ? cell2[i] : cell1[i];  // Other is player's cell
+        var newFace = playerOn1 ? face2[i] : face1[i];  // Where the next cell is
+            
+        neiCells.set(newFace, currCell); 
+    }
 }
