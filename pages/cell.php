@@ -1,6 +1,6 @@
 <?php
     $cellId = isset($_GET['id']) ? intval($_GET['id']) : -1;
-    // TODO: add key help to know which key do what (zqsd and space)
+    // TODO: add key help to know which key do what (zqsd)
     // TODO: show how many keys the player has if he has any (in js prolly)
 ?>
 
@@ -17,8 +17,11 @@
         </h1>
         
         <canvas id="cellCanvas" width="300" height="300" style="border:1px solid black;"></canvas>
-        <script type="module" src="../js/mainCell.js" defer></script>
-        <script type="module" src="../js/playerMovement.js" defer></script>
+        <?php /*<script src="../js/cell.js" defer></script>*/ ?>
+        <script src="../js/mainCell.js" defer type="module"></script>
+        <script src="../js/mazeData.js" defer type="module"></script>
+        <script src="../js/playerMovement.js" defer type="module"></script>
+         
         
     </body>
 </html>
