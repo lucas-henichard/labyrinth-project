@@ -26,6 +26,18 @@ export const doorColor =
 }
 
 
+export const cellUrl = 
+{
+    "undefined": "../res/images/wall.png",
+    "grille": "../res/images/door.jpg",
+    "vide": "../res/images/empty hallway.jpg",
+    "cle": "../res/images/jerrycanHalo.jpg",
+    /*"sortie": "../res/images/exit.png",  // TODO: find an exit image
+    "cyberdemon": "../res/images/cyberdemon.png"*/  // screamer img
+}
+// "chainsaw": "../res/images/chainsaw.gif",  // TODO: dont forget to consider the extension
+
+
 export async function fetchSql()
 {
     // Cell id and description

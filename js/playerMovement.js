@@ -1,5 +1,5 @@
 import {neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD, setKeyAmnt, face, setFace} from "./mazeData.js";
-import {drawInFront} from "./mainCell.js";
+import {drawInFront} from "./rendering.js";
 
 var faces = ["O", "N", "E", "S"];
 
