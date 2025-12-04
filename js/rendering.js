@@ -1,5 +1,7 @@
 import { cellType, cell1, cell2, face1, face2, doorType, cellColor,
-    doorColor, tknK , tknD, cellSize, neiCells, face, refreshNeiCells, cellUrl
+    doorColor, tknK , tknD, cellSize, neiCells, face, refreshNeiCells, cellUrl,
+    doorCells,
+    playerCellId
  } from "./mazeData.js";
 
 
@@ -169,6 +171,13 @@ export function drawInFront()
         return;
     }
     
+    if (doorCells.has(facedId) && !tknD.has(facedId) && doorCells.get(facedId) == playerCellId)
+    {
+        // TODO: change canvas size to match other images
+        drawImage(cellUrl["grille"], 0, 0, 300, 300);
+        return;
+    }
+
     drawImage(imgSrc, 0, 0, 300, 300);
 }
 
