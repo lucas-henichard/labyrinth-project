@@ -12,7 +12,7 @@ async function cell_onLoad()
 
     // If no cell specified, load start
     if (playerCellId == -1)
-        playerCellId = loadStart();
+        setPlayerCellId(loadStart());
 
     if (face == undefined)
         setFace("N");

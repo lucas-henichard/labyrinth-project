@@ -10,6 +10,11 @@ export var neiCells = new Map();
 export var tknK = new Set();  // Keys alr taken
 export var tknD = new Set();  // Doors alr taken
 
+export var gifFrames = new Map();  // gifPath: [frame1Path, frame2Path, ...]
+export var gifCurrentFrame = new Map();  // gifPath: currentFrameIndex
+
+export var doorOpening = false;
+
 export const cellColor = 
 {
     "vide": "lightgray",
@@ -32,8 +37,7 @@ export const cellUrl =
     "grille": "../res/images/door.jpg",
     "vide": "../res/images/empty hallway.jpg",
     "cle": "../res/images/jerrycanHalo.jpg",
-    /*"sortie": "../res/images/exit.png",  // TODO: find an exit image
-    "cyberdemon": "../res/images/cyberdemon.png"*/  // screamer img
+    "sortie": "../res/images/exitDoor/frame_0.png",  // TODO: find an exit image
 }
 // "chainsaw": "../res/images/chainsaw.gif",  // TODO: dont forget to consider the extension
 
@@ -149,4 +153,21 @@ export function refreshNeiCells()
             
         neiCells.set(newFace, currCell); 
     }
+}
+
+
+export function setGifFrames(gifPath, frames)
+{
+    gifFrames.set(gifPath, frames);
+}
+
+
+export function setGifCurrentFrame(gifPath, frameData)
+{
+    gifCurrentFrame.set(gifPath, frameData);
+}
+
+export function setDoorOpening(isOpening)
+{
+    doorOpening = isOpening;
 }

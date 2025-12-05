@@ -12,11 +12,9 @@
     </head>
     
     <body>
-        <h1>
-            <?php echo "Cell ID: " . $cellId; ?>
-        </h1>
+        <canvas id="cellCanvas"></canvas>
+        <canvas id="gifCanvas"></canvas>
         
-        <canvas id="cellCanvas" width="300" height="300" style="border:1px solid black;"></canvas>
         <script src="../js/mazeData.js" defer type="module"></script>
         <script src="../js/mainCell.js" defer type="module"></script>
         <script src="../js/playerMovement.js" defer type="module"></script>

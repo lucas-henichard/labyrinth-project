@@ -1,27 +1,26 @@
-import {neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD, setKeyAmnt, face, setFace} from "./mazeData.js";
+import {neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD, setKeyAmnt, face, setFace,
+    doorOpening, cellType, setDoorOpening
+} from "./mazeData.js";
 import {drawInFront} from "./rendering.js";
 
-var faces = ["O", "N", "E", "S"];
+
+const faces = ["O", "N", "E", "S"];
 
 
 window.addEventListener('keydown', (event) =>
 {
+    let shouldOpenDoor = false;
+
     switch(event.key.toLowerCase())
     {
         case 'z':
             movePlayer(face);
             break;
-        case 's':
-            // TODO: delete
-            //movePlayer("S");
-            break;
         case 'd':
-            //movePlayer("E");
             setFace(faces[(faces.indexOf(face) + 1) % 4])
             console.log(face);
             break;
         case 'q':
-            //movePlayer("O");
             setFace(faces[(faces.indexOf(face) - 1) % 4])
             if (face == undefined)
                 setFace("S");
@@ -40,9 +39,16 @@ window.addEventListener('keydown', (event) =>
             localStorage.setItem("id", "13");
             window.location.href = "cell.php";
             break;
+        case "e":
+            if (cellType[neiCells.get(face)] == "sortie" && !doorOpening)
+            {
+                setDoorOpening(true);
+                shouldOpenDoor = true;
+            }
+            break;
     }
 
-    drawInFront();
+    drawInFront(shouldOpenDoor);
 });
 
 
