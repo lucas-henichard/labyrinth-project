@@ -1,10 +1,11 @@
-import { playerCellId, keyAmnt, doorCells, IdArr, cellType, cell1, cell2, face1, face2, doorType, cellColor,
-    doorColor, fetchSql, setKeyAmnt, setPlayerCellId, tknK , tknD, cellSize, neiCells, setFace, face, refreshNeiCells
+import
+{ 
+    playerCellId, keyAmnt, doorCells, IdArr, cellType, fetchSql, setKeyAmnt,
+     setPlayerCellId, tknK , tknD, neiCells, setFace, face
 } from "./mazeData.js";
 
 import { drawInFront } from "./rendering.js";
-// TODO: check why we're spawning above the start 
-// TODO: use resident evil door as exit (first, use the thumbnail and once the player pressed space (type to press it) play the gif -> screamer) before the door is opened, play jojo menacing gif
+
 
 async function cell_onLoad()
 {
@@ -18,7 +19,6 @@ async function cell_onLoad()
         setFace("N");
     
     drawInFront();
-    //drawCloseMaze(playerCellId);
     
     for (var elt of neiCells)
     {
@@ -47,7 +47,7 @@ async function cell_onLoad()
 
     if (cellType[playerCellId] == "sortie")
     {
-        console.log("You reached the exit");
+        console.log("You reached the exit");  // TODO: show victory screen or smth similar
     }
 }
 
@@ -61,18 +61,18 @@ function loadStart()
             return IdArr[i];
         }
     }
-
-    return -1;
 }
 
 
 window.addEventListener('DOMContentLoaded', async () => 
 {
     setPlayerCellId(parseInt(localStorage.getItem("id")));
-    if (isNaN(playerCellId)) setPlayerCellId(-1);
+    if (isNaN(playerCellId))
+        setPlayerCellId(-1);
 
     setKeyAmnt(parseInt(localStorage.getItem("keys")));
-    if (isNaN(keyAmnt)) setKeyAmnt(0);
+    if (isNaN(keyAmnt))
+        setKeyAmnt(0);
 
     tknK.clear();
     const tknKStr = localStorage.getItem("takenKeys");
@@ -80,7 +80,8 @@ window.addEventListener('DOMContentLoaded', async () =>
     {
         tknKStr.split(',').forEach(id => 
         {
-            if (id !== '') tknK.add(parseInt(id));
+            if (id !== '')
+                tknK.add(parseInt(id));
         });
     }
 
@@ -90,7 +91,8 @@ window.addEventListener('DOMContentLoaded', async () =>
     {
         tknDStr.split(',').forEach(id => 
         {
-            if (id !== '') tknD.add(parseInt(id));
+            if (id !== '')
+                tknD.add(parseInt(id));
         });
     }
 

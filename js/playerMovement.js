@@ -1,7 +1,10 @@
-import {neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD, setKeyAmnt, face, setFace,
-    doorOpening, cellType, setDoorOpening
+import 
+{
+    neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD,
+    setKeyAmnt, face, setFace, doorOpening, cellType, setDoorOpening
 } from "./mazeData.js";
-import {drawInFront} from "./rendering.js";
+
+import { drawInFront } from "./rendering.js";
 
 
 const faces = ["O", "N", "E", "S"];
@@ -30,11 +33,7 @@ window.addEventListener('keydown', (event) =>
             movePlayer("C");
             break;
         case "r":
-            localStorage.clear();
-            localStorage.setItem("id", playerCellId.toString());
-            window.location.href = "cell.php";
-            break;
-        case "t":
+            // Reset the game
             localStorage.clear();
             localStorage.setItem("id", "13");
             window.location.href = "cell.php";

@@ -6,7 +6,7 @@ export var face = "N";
 
 export var IdArr, cellType, cell1, cell2, face1, face2, doorType;
 export var playerCellId = -1;
-export var neiCells = new Map();
+export var neiCells = new Map();  // face: cellId
 export var tknK = new Set();  // Keys alr taken
 export var tknD = new Set();  // Doors alr taken
 
@@ -30,16 +30,14 @@ export const doorColor =
     "grille": "yellow",
 }
 
-
 export const cellUrl = 
 {
     "undefined": "../res/images/wall.png",
     "grille": "../res/images/door.jpg",
     "vide": "../res/images/empty hallway.jpg",
     "cle": "../res/images/jerrycanHalo.jpg",
-    "sortie": "../res/images/exitDoor/frame_0.png",  // TODO: find an exit image
+    "sortie": "../res/images/exitDoor/frame_0.png"
 }
-// "chainsaw": "../res/images/chainsaw.gif",  // TODO: dont forget to consider the extension
 
 
 export async function fetchSql()
@@ -166,6 +164,7 @@ export function setGifCurrentFrame(gifPath, frameData)
 {
     gifCurrentFrame.set(gifPath, frameData);
 }
+
 
 export function setDoorOpening(isOpening)
 {
