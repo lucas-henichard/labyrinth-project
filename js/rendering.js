@@ -1,8 +1,7 @@
 import 
 {
-    cellType, cell1, cell2, face1, face2, doorType, cellColor,
-    doorColor, tknK , tknD, cellSize, neiCells, face, refreshNeiCells, cellUrl,
-    doorCells, playerCellId, gifFrames, setGifFrames, setGifCurrentFrame, gifCurrentFrame,
+    cellType, cellColor, tknD, neiCells, face, refreshNeiCells, cellUrl,
+    doorCells, playerCellId, gifFrames, gifCurrentFrame,
     keyAmnt,
 } from "./mazeData.js";
 

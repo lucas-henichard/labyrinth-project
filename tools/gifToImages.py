@@ -1,5 +1,3 @@
-# TODO: add a readme to help ppl how to execute this (pyinstaller command)
-
 from PIL import Image
 import os
 
