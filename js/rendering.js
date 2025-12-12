@@ -2,7 +2,7 @@ import
 {
     cellType, cellColor, tknD, neiCells, face, refreshNeiCells, cellUrl,
     doorCells, playerCellId, gifFrames, gifCurrentFrame,
-    keyAmnt,
+    keyAmnt, setDoorOpened
 } from "./mazeData.js";
 
 // TODO: dynamically change canvas' size based on window size
@@ -16,6 +16,9 @@ const gifCtx = gifCanvas.getContext("2d");
 const canvasWidth = gifCanvas.width;
 const canvasHeight = gifCanvas.height;
 
+const textCanvas = document.getElementById("textCanvas");
+const textCtx = textCanvas.getContext("2d");
+
 const gifFps = 30;
 const frameDuration = 1000 / gifFps;
 let lastTime = 0;
@@ -23,9 +26,7 @@ let lastTime = 0;
 
 export async function drawInFront(shouldOpenDoor = false)
 {
-    const canvas = document.getElementById("cellCanvas");
-    const ctx = canvas.getContext("2d");
-
+    textCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     refreshNeiCells();
 
     let facedId = neiCells.get(face);
@@ -35,32 +36,34 @@ export async function drawInFront(shouldOpenDoor = false)
     if (imgSrc === undefined)
     {
         ctx.fillStyle = cellColor[cellType[facedId]];
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     else
     {
-        drawImage(imgSrc, 0, 0, canvasWidth, canvasHeight, ctx);
+        drawImage(imgSrc, 0, 0, canvas.width, canvas.height, ctx);
     }
 
     // Door closed
     if (doorCells.has(facedId) && !tknD.has(facedId) && doorCells.get(facedId) == playerCellId)
     {
-        drawImage(cellUrl["grille"], 0, 0, canvasWidth, canvasHeight, ctx);
+        drawImage(cellUrl["grille"], 0, 0, canvas.width, canvas.height, ctx);
     }
 
     if (cellType[facedId] == "sortie" && shouldOpenDoor)
     {
-        startGif("../res/images/exitDoor.gif", 0, 0, canvasWidth, canvasHeight, false);
+        await startGif("../res/images/exitDoor.gif", 0, 0, gifCanvas.width, gifCanvas.height, false);
+        gifCtx.clearRect(0, 0, gifCanvas.width, gifCanvas.height);
+        setDoorOpened(true);
     }
 
     // Renders chainsaw
     if (keyAmnt > 0)
     {
-        startGif("../res/images/chainsaw.gif", canvasWidth/4, canvasHeight/2, canvasWidth/2, canvasHeight/2);
+        startGif("../res/images/chainsaw.gif", gifCanvas.width/4, gifCanvas.height/2, gifCanvas.width/2, gifCanvas.height/2);
     }
     else
     {
-        drawImage("../res/images/chainsaw/frame_0.png", canvasWidth/4, canvasHeight/2, canvasWidth/2, canvasHeight/2, gifCtx);
+        drawImage("../res/images/chainsaw/frame_0.png", gifCanvas.width/4, gifCanvas.height/2, gifCanvas.width/2, gifCanvas.height/2, gifCtx);
     }
 }
 
@@ -157,4 +160,20 @@ function jumpScare()
     audio.play();
 
     drawImage("../res/images/cyberdemon.webp", 0, 0, canvasWidth, canvasHeight, gifCtx);
+}
+
+
+export function showMinigame()
+{
+    // TODO: complete this
+    return true;  // player won the minigame
+}
+
+
+export function displayMsg(message)
+{
+    textCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+    textCtx.font = Math.round(textCanvas.height/12) + "px serif";
+    textCtx.fillStyle = "white";
+    textCtx.fillText(message, 10, 10);
 }

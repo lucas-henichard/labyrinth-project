@@ -3,10 +3,15 @@
 
     $file_db = "../database/labyrinthe.db";
     $sqlite = new SQLite3(filename: $file_db);
-        
-    $sql = 'select * from passage;';
+    
+    $playersCell = $_GET("id");
 
-    $result = $sqlite->query($sql);
+    $sql = 'select * from passage where couloir1=:playerPos or couloir2=:playerPos;';
+    
+	$query = $sqlite -> prepare($sql);	
+	$query -> bindValue(':playerPos', $playersCell);
+	
+	$result = $query -> execute();
 
     $data = [];
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
@@ -14,6 +19,5 @@
         $data[] = $row;
     }
 
-    // return as json
     echo json_encode($data);
 ?>

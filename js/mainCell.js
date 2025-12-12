@@ -1,7 +1,8 @@
 import
 { 
-    playerCellId, keyAmnt, doorCells, IdArr, cellType, fetchSql, setKeyAmnt,
-     setPlayerCellId, tknK , tknD, neiCells, setFace, face
+    playerCellId, keyAmnt, doorCells, cellType, fetchSql, setKeyAmnt, IdArr,
+    setPlayerCellId, tknK , tknD, neiCells, setFace, face, score, exitCell,
+    setExitCell
 } from "./mazeData.js";
 
 import { drawInFront } from "./rendering.js";
@@ -9,22 +10,26 @@ import { drawInFront } from "./rendering.js";
 
 async function cell_onLoad()
 {
-    await fetchSql();
-
-    // If no cell specified, load start
+    await fetchSql();  // TODO: test if this is needed
+    
+    // If no cell is specified, load start
     if (playerCellId == -1)
-        setPlayerCellId(loadStart());
-
+        setPlayerCellId(getCellId("depart"));
+    
+    if (exitCell == -1)
+        setExitCell(getCellId("sortie"));
+    
     if (face == undefined)
         setFace("N");
     
     drawInFront();
     
+    console.log("neiCells: ");
     for (var elt of neiCells)
     {
-        console.log(elt);
+            console.log(elt);
     }
-
+        
     if (cellType[playerCellId] == "cle")
     {
         if (!tknK.has(playerCellId))
@@ -47,18 +52,19 @@ async function cell_onLoad()
 
     if (cellType[playerCellId] == "sortie")
     {
+        console.log("Your score is: " + score);
         console.log("You reached the exit");  // TODO: show victory screen or smth similar
     }
 }
 
 
-function loadStart()
+export function getCellId(cell)
 {
-    for (let i = 0; i < IdArr.length; i++)
+    for (let i = 0; i < cellType.length; i++)
     {
-        if (cellType[IdArr[i]] == "depart")
+        if (cellType[i] == cell)
         {
-            return IdArr[i];
+            return i;
         }
     }
 }
@@ -100,3 +106,35 @@ window.addEventListener('DOMContentLoaded', async () =>
 
     await cell_onLoad();
 });
+
+
+window.addEventListener("resize", resizeCanvas, false);
+
+
+function resizeCanvas() 
+{
+    //resize canvas
+    if(window.innerHeight >= (16*window.innerWidth/9)) 
+    {
+        canvas.width  = window.innerWidth;
+        canvas.height = Math.floor(16*canvas.width/9);
+
+        textCanvas.width  = window.innerWidth;
+        textCanvas.height = Math.floor(16*textCanvas.width/9);
+        
+        gifCanvas.width  = window.innerWidth;
+        gifCanvas.height = Math.floor(16*gifCanvas.width/9);
+
+    }
+    else 
+    {
+        canvas.height = window.innerHeight;
+        canvas.width  = Math.floor(9*canvas.height/16);
+        
+        gifCanvas.height = window.innerHeight;
+        gifCanvas.width  = Math.floor(9*gifCanvas.height/16);
+        
+        textCanvas.height = window.innerHeight;
+        textCanvas.width  = Math.floor(9*textCanvas.height/16);
+    }
+}

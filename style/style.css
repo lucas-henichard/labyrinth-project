@@ -1,9 +1,15 @@
+
+body
+{
+    background-color: black;
+}
+
 canvas
 {
     position: absolute;
     left: 0;
     top: 0;
     pointer-events: none;
-    width: 1200px;
-    height: 800px;  /* img size is 766 here */
+    /*width: 1200px;
+    height: 800px;*/  /* img size is 766 here */
 }

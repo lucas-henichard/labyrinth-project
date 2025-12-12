@@ -4,16 +4,20 @@ export var keyAmnt = 0;
 export var doorCells = new Map();
 export var face = "N";
 
+//export var cellType;
 export var IdArr, cellType, cell1, cell2, face1, face2, doorType;
 export var playerCellId = -1;
 export var neiCells = new Map();  // face: cellId
 export var tknK = new Set();  // Keys alr taken
 export var tknD = new Set();  // Doors alr taken
+export var score = 100;
+export var exitCell = -1;
 
 export var gifFrames = new Map();  // gifPath: [frame1Path, frame2Path, ...]
 export var gifCurrentFrame = new Map();  // gifPath: currentFrameIndex
 
 export var doorOpening = false;
+export var doorOpened = false;
 
 export const cellColor = 
 {
@@ -24,11 +28,6 @@ export const cellColor =
     "undefined": "black"
 };
 
-export const doorColor = 
-{
-    "libre": "lightgray",
-    "grille": "yellow",
-}
 
 export const cellUrl = 
 {
@@ -40,13 +39,14 @@ export const cellUrl =
 }
 
 
-export async function fetchSql()
+export async function fetchSql()  // TODO: dont load everything everytime, remake this and refreshNeiCells
 {
     // Cell id and description
     IdArr = new Array();
     cellType = new Array();
 
     // ways between cells
+    
     cell1 = new Array();
     cell2 = new Array();
     face1 = new Array();
@@ -68,12 +68,12 @@ export async function fetchSql()
             {
                 let id = data[i].id;
 
-                IdArr[id] = id;
+                //IdArr[id] = id;
                 cellType[id] = data[i].type;
             }
         })
         .catch(error => console.error("Error :", error));
-        
+         
     await fetch("../database/getDoors.php")
         .then(response => 
         {
@@ -85,6 +85,7 @@ export async function fetchSql()
             console.log("passages: ", data);
 
             // loop through result
+            
             for (let i = 0; i < data.length; i++)
             {
                 cell1[i] = data[i].couloir1;
@@ -135,10 +136,37 @@ export function setFace(newFace)
 }
 
 
-export function refreshNeiCells()
+export async function refreshNeiCells()
 {
     neiCells.clear();
 
+    /*
+    var cell1 = new Array();
+    var cell2 = new Array();
+    var face1 = new Array();
+    var face2 = new Array();
+
+    await fetch("../database/getDoors.php")
+        .then(response => 
+        {
+            if (!response.ok) throw new Error ("Network error");
+            return response.json();
+        })
+        .then(data =>
+        {
+            console.log("passages: ", data);
+
+            // loop through result
+            for (let i = 0; i < data.length; i++)
+            {
+                cell1[i] = data[i].couloir1;
+                cell2[i] = data[i].couloir2;
+                face1[i] = data[i].position1;
+                face2[i] = data[i].position2;
+            }
+        })
+        .catch(error => console.error("Error: ", error));
+*/
     for (let i = 0; i < cell1.length; i++)
     {
         // Cell isnt linked to player's
@@ -149,7 +177,7 @@ export function refreshNeiCells()
         var currCell = playerOn1 ? cell2[i] : cell1[i];  // Other is player's cell
         var newFace = playerOn1 ? face2[i] : face1[i];  // Where the next cell is
             
-        neiCells.set(newFace, currCell); 
+        neiCells.set(newFace, currCell);
     }
 }
 
@@ -169,4 +197,22 @@ export function setGifCurrentFrame(gifPath, frameData)
 export function setDoorOpening(isOpening)
 {
     doorOpening = isOpening;
+}
+
+
+export function setScore(newScore)
+{
+    score = newScore; 
+}
+
+
+export function setExitCell(exitCellId)
+{
+    exitCell = exitCellId;
+}
+
+
+export function setDoorOpened(isOpened)
+{
+    doorOpened = isOpened;
 }
