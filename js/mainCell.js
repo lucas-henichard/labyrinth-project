@@ -1,21 +1,23 @@
 import
 { 
-    playerCellId, keyAmnt, doorCells, cellType, fetchSql, setKeyAmnt, IdArr,
+    playerCellId, keyAmnt, cellType, fetchSql, setKeyAmnt,
     setPlayerCellId, tknK , tknD, neiCells, setFace, face, score, exitCell,
-    setExitCell
+    setExitCell, IdArr, setScore, setIdArr, setCellType,
+    setDoorCells
 } from "./mazeData.js";
 
 import { drawInFront } from "./rendering.js";
 
+const RATIO = 16 / 9;
+let canvas, ctx;
+let gifCanvas, gifCtx;
+let textCanvas, textCtx;
+
 
 async function cell_onLoad()
 {
-    await fetchSql();  // TODO: test if this is needed
-    
-    // If no cell is specified, load start
-    if (playerCellId == -1)
-        setPlayerCellId(getCellId("depart"));
-    
+    await fetchSql();
+
     if (exitCell == -1)
         setExitCell(getCellId("sortie"));
     
@@ -23,6 +25,7 @@ async function cell_onLoad()
         setFace("N");
     
     drawInFront();
+    console.log("score: " + score);
     
     console.log("neiCells: ");
     for (var elt of neiCells)
@@ -72,10 +75,71 @@ export function getCellId(cell)
 
 window.addEventListener('DOMContentLoaded', async () => 
 {
+    // Load saved data
+    loadData();
+
+    // Canvas setup
+    canvas = document.getElementById("cellCanvas");
+    gifCanvas = document.getElementById("gifCanvas");
+    textCanvas = document.getElementById("textCanvas");
+    
+    ctx = canvas.getContext("2d");
+    gifCtx = gifCanvas.getContext("2d");
+    textCtx = textCanvas.getContext("2d");
+
+    resizeCanvas(false);
+
+    await cell_onLoad();
+});
+
+
+function resizeCanvas(shouldRedraw = false)
+{
+    if (!canvas || !gifCanvas || !textCanvas)
+        return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const windowWidth  = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let width  = windowWidth;
+    let height = width / RATIO;
+    if (height > windowHeight) 
+    {
+        height = windowHeight;
+        width  = height * RATIO;
+    }
+
+    [ {canvas, ctx}, {canvas: gifCanvas, ctx: gifCtx} ].forEach(c =>
+    {
+        c.canvas.style.width  = width + "px";
+        c.canvas.style.height = height + "px";
+    });
+
+    // textCanvas gets a better resolution for clearer text
+    textCanvas.style.width  = width + "px";
+    textCanvas.style.height = height + "px";
+    textCanvas.width  = width * dpr;
+    textCanvas.height = height * dpr;
+    textCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (shouldRedraw)
+        drawInFront();
+}
+
+
+window.addEventListener("resize", () =>
+{
+        resizeCanvas(true);
+});
+
+
+function loadData()
+{
     setPlayerCellId(parseInt(localStorage.getItem("id")));
     if (isNaN(playerCellId))
         setPlayerCellId(-1);
-
+    
     setKeyAmnt(parseInt(localStorage.getItem("keys")));
     if (isNaN(keyAmnt))
         setKeyAmnt(0);
@@ -97,44 +161,33 @@ window.addEventListener('DOMContentLoaded', async () =>
     {
         tknDStr.split(',').forEach(id => 
         {
-            if (id !== '')
-                tknD.add(parseInt(id));
+        if (id !== '')
+            tknD.add(parseInt(id));
         });
     }
-
+    
     setFace(localStorage.getItem("face"));
+    
+    const savedScore = parseInt(localStorage.getItem("score"));
+    setScore(Number.isNaN(savedScore) ? 100 : savedScore);
 
-    await cell_onLoad();
-});
+    setExitCell(parseInt(localStorage.getItem("exitCell")));
+    if (isNaN(exitCell))
+        setExitCell(-1);
 
+    setIdArr(localStorage.getItem("IdArr") ? localStorage.getItem("IdArr").split(',').map(id => parseInt(id)) : []);
+    if (!IdArr || IdArr.length == 0)
+        setIdArr(undefined);
 
-window.addEventListener("resize", resizeCanvas, false);
+    setCellType(localStorage.getItem("cellType") ? localStorage.getItem("cellType").split(',') : []);
+    if (!cellType || cellType.length == 0)
+        setCellType(undefined);
 
-
-function resizeCanvas() 
-{
-    //resize canvas
-    if(window.innerHeight >= (16*window.innerWidth/9)) 
+    setDoorCells(new Map());
+    const doorCellsStr = localStorage.getItem("doorCells");
+    if (doorCellsStr && doorCellsStr.length > 0)
     {
-        canvas.width  = window.innerWidth;
-        canvas.height = Math.floor(16*canvas.width/9);
-
-        textCanvas.width  = window.innerWidth;
-        textCanvas.height = Math.floor(16*textCanvas.width/9);
-        
-        gifCanvas.width  = window.innerWidth;
-        gifCanvas.height = Math.floor(16*gifCanvas.width/9);
-
-    }
-    else 
-    {
-        canvas.height = window.innerHeight;
-        canvas.width  = Math.floor(9*canvas.height/16);
-        
-        gifCanvas.height = window.innerHeight;
-        gifCanvas.width  = Math.floor(9*gifCanvas.height/16);
-        
-        textCanvas.height = window.innerHeight;
-        textCanvas.width  = Math.floor(9*textCanvas.height/16);
+        const doorEntries = JSON.parse(doorCellsStr);
+        setDoorCells(new Map(doorEntries));
     }
 }

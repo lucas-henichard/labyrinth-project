@@ -1,12 +1,11 @@
 import 
 {
     neiCells, doorCells, playerCellId, keyAmnt, tknK, tknD,
-    setKeyAmnt, face, setFace, doorOpening, cellType, setDoorOpening, setScore, score,
-    exitCell, doorOpened
+    setKeyAmnt, face, setFace, doorOpening, cellType, setDoorOpening,
+    setScore, score, exitCell, doorOpened, IdArr,
 } from "./mazeData.js";
 
-import { drawInFront, displayMsg, showMinigame } from "./rendering.js";
-import { getCellId } from "./mainCell.js";
+import { drawInFront, displayMsg } from "./rendering.js";
 
 
 const faces = ["O", "N", "E", "S"];
@@ -42,20 +41,20 @@ window.addEventListener('keydown', (event) =>
         case "r":
             // Reset the game
             localStorage.clear();
-            localStorage.setItem("id", getCellId("depart").toString());
+            localStorage.setItem("id", "-1");
             window.location.href = "cell.php";
             break;
         case "e":
             if (cellType[neiCells.get(face)] == "sortie" && !doorOpening)
             {
                 setDoorOpening(true);
-                shouldOpenDoor = showMinigame();  // TODO: replace this by a true if not enough time for minigame programming
+                shouldOpenDoor = true;
             }
             redraw = true;
             break;
     }
 
-    console.log(redraw);
+    console.log("should redraw: " + redraw);
     if (redraw)
         drawInFront(shouldOpenDoor);
 });
@@ -74,11 +73,11 @@ function movePlayer(direction)
 
     if (direction == "C")
     {
-        setScore(score + hiddenSum);    
+        setScore(score + hiddenSum);
     }
     else
     {
-        setScore(score * movementFactor);
+        setScore(score - score * movementFactor);
     }
 
     const newCellId = neiCells.get(direction);
@@ -118,14 +117,18 @@ function movePlayer(direction)
     }
     
     // Save new state to localStorage
-    localStorage.setItem("id", newCellId.toString());                    // new player position
-    localStorage.setItem("keys", keyAmnt.toString());                    // keys amount
-    localStorage.setItem("takenKeys", Array.from(tknK).join(','));       // collected keys
-    localStorage.setItem("takenDoors", Array.from(tknD).join(','));      // opened doors 
-    localStorage.setItem("face", face);                                  // faced direction
-    localStorage.setItem("exitCell", exitCell.toString());               // exitCell id
-    localStorage.setItem("score", score.toString());                     // score
+    localStorage.setItem("id", newCellId.toString());                                       // new player position
+    localStorage.setItem("keys", keyAmnt.toString());                                       // keys amount
+    localStorage.setItem("takenKeys", Array.from(tknK).join(','));                          // collected keys
+    localStorage.setItem("takenDoors", Array.from(tknD).join(','));                         // opened doors 
+    localStorage.setItem("face", face);                                                     // faced direction
+    localStorage.setItem("exitCell", exitCell.toString());                                  // exitCell id
+    localStorage.setItem("score", score.toString());                                        // score
+    localStorage.setItem("cellType", cellType.join(','));                                   // cell type
+    localStorage.setItem("IdArr", IdArr.join(','));                                         // all cell ids
+    localStorage.setItem("doorCells", JSON.stringify(Array.from(doorCells.entries())));     // door cells
 
+    
     window.location.href = "cell.php";
 
     return true;

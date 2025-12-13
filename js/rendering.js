@@ -1,6 +1,6 @@
 import 
 {
-    cellType, cellColor, tknD, neiCells, face, refreshNeiCells, cellUrl,
+    cellType, cellColor, tknD, neiCells, face, cellUrl,
     doorCells, playerCellId, gifFrames, gifCurrentFrame,
     keyAmnt, setDoorOpened
 } from "./mazeData.js";
@@ -8,17 +8,17 @@ import
 // TODO: dynamically change canvas' size based on window size
 // TODO: when standing in front of exit door, show the key to press to open it (e) and before its pressed also display jojo menacing gif
 
+// Canvas setup
 const canvas = document.getElementById("cellCanvas");
 const ctx = canvas.getContext("2d");
 
 const gifCanvas = document.getElementById("gifCanvas");
 const gifCtx = gifCanvas.getContext("2d");
-const canvasWidth = gifCanvas.width;
-const canvasHeight = gifCanvas.height;
 
 const textCanvas = document.getElementById("textCanvas");
 const textCtx = textCanvas.getContext("2d");
 
+// GIF settings
 const gifFps = 30;
 const frameDuration = 1000 / gifFps;
 let lastTime = 0;
@@ -26,8 +26,7 @@ let lastTime = 0;
 
 export async function drawInFront(shouldOpenDoor = false)
 {
-    textCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-    refreshNeiCells();
+    textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
 
     let facedId = neiCells.get(face);
     let imgSrc = cellUrl[cellType[facedId]];
@@ -159,21 +158,14 @@ function jumpScare()
     const audio = new Audio("../res/sounds/foxy_screamer.m4a");
     audio.play();
 
-    drawImage("../res/images/cyberdemon.webp", 0, 0, canvasWidth, canvasHeight, gifCtx);
-}
-
-
-export function showMinigame()
-{
-    // TODO: complete this
-    return true;  // player won the minigame
+    drawImage("../res/images/cyberdemon.webp", 0, 0, canvas.width, canvas.height, gifCtx);
 }
 
 
 export function displayMsg(message)
 {
-    textCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-    textCtx.font = Math.round(textCanvas.height/12) + "px serif";
-    textCtx.fillStyle = "white";
-    textCtx.fillText(message, 10, 10);
+    textCtx.clearRect(0, 0, canvas.width, canvas.height);
+    textCtx.font = Math.round(textCanvas.height/32) + "px serif";
+    textCtx.fillStyle = "gray";
+    textCtx.fillText(message, textCanvas.width/10, textCanvas.height - (9*textCanvas.height/10));
 }

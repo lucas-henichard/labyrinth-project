@@ -1,11 +1,12 @@
+import { getCellId } from "./mainCell.js";
+
 export const cellSize = 100;
 
 export var keyAmnt = 0;
 export var doorCells = new Map();
 export var face = "N";
 
-//export var cellType;
-export var IdArr, cellType, cell1, cell2, face1, face2, doorType;
+export var IdArr, cellType, cell1, cell2, face1, face2;
 export var playerCellId = -1;
 export var neiCells = new Map();  // face: cellId
 export var tknK = new Set();  // Keys alr taken
@@ -29,6 +30,7 @@ export const cellColor =
 };
 
 
+// TODO: add image to start and exit cells + add bg music
 export const cellUrl = 
 {
     "undefined": "../res/images/wall.png",
@@ -39,83 +41,92 @@ export const cellUrl =
 }
 
 
-export async function fetchSql()  // TODO: dont load everything everytime, remake this and refreshNeiCells
+export async function fetchSql()
 {
-    // Cell id and description
-    IdArr = new Array();
-    cellType = new Array();
+    if (!cellType || !IdArr)
+    {
+        console.log("Fetching hallways data...");
 
-    // ways between cells
+        IdArr = new Array();
+        cellType = new Array();
+
+        await fetch("../database/getHallways.php")
+            .then(response =>
+            {
+                if (!response.ok)
+                    throw new Error("Network error");
+                return response.json(); // <-- transform json stream to js object
+            })
+            .then(data => 
+            {
+                console.log("couloirs: ", data);
+                
+                // loop through result
+                for (let i = 0; i < data.length; i++)
+                {
+                    let id = data[i].id;
+                    IdArr[i] = id;
+                    cellType[id] = data[i].type;
+                }
+            })
+            .catch(error => console.error("Error :", error));
+    }
+
+    if (doorCells.size == 0 || !doorCells)
+    {
+        console.log("Fetching closed doors data...");
+
+        await fetch("../database/getClosedDoors.php")
+            .then(response => 
+            {
+                if (!response.ok)
+                    throw new Error ("Network error");
+                return response.json();
+            })
+            .then(data =>
+            {
+                console.log("Grilles: ", data);
+
+                // loop through result
+                for (let i = 0; i < data.length; i++)
+                {
+                    doorCells.set(data[i].couloir1, data[i].couloir2);
+                    doorCells.set(data[i].couloir2, data[i].couloir1);
+                }
+            })
+            .catch(error => console.error("Error: ", error));
+    }
+
+    if (playerCellId == -1 || playerCellId == undefined)
+        setPlayerCellId(getCellId("depart"));
     
-    cell1 = new Array();
-    cell2 = new Array();
-    face1 = new Array();
-    face2 = new Array();
-    doorType = new Array();
+    await refreshNeiCells();
+}
 
-    await fetch("../database/getHallways.php")
+
+export async function refreshNeiCells()
+{
+    neiCells.clear();
+
+    await fetch(`../database/getNeiCells.php?playerCellId=${playerCellId}`)
         .then(response =>
         {
-            if (!response.ok) throw new Error("Network error");
-            return response.json(); // <-- transform json stream to js object
-        })
-        .then(data => 
-        {
-            console.log("couloirs: ", data);
-            
-            // loop through result
-            for (let i = 0; i < data.length; i++)
-            {
-                let id = data[i].id;
-
-                //IdArr[id] = id;
-                cellType[id] = data[i].type;
-            }
-        })
-        .catch(error => console.error("Error :", error));
-         
-    await fetch("../database/getDoors.php")
-        .then(response => 
-        {
-            if (!response.ok) throw new Error ("Network error");
+            if (!response.ok)
+                throw new Error("Network error");
             return response.json();
         })
         .then(data =>
         {
-            console.log("passages: ", data);
+            console.log("Neighbors:", data);
 
-            // loop through result
-            
-            for (let i = 0; i < data.length; i++)
+            for (const face in data)
             {
-                cell1[i] = data[i].couloir1;
-                cell2[i] = data[i].couloir2;
-                face1[i] = data[i].position1;
-                face2[i] = data[i].position2;
-                doorType[i] = data[i].type;
-            }
-        })
-        .catch(error => console.error("Error: ", error));
-
-    await fetch("../database/getClosedDoors.php")
-        .then(response => 
-        {
-            if (!response.ok) throw new Error ("Network error");
-            return response.json();
-        })
-        .then(data =>
-        {
-            console.log("Grilles: ", data);
-
-            // loop through result
-            for (let i = 0; i < data.length; i++)
-            {
-                doorCells.set(data[i].couloir1, data[i].couloir2);
-                doorCells.set(data[i].couloir2, data[i].couloir1);
+                neiCells.set(face, data[face]);
             }
         })
         .catch(error => console.error("Error: ", error));
 }
+
 
 
 export function setPlayerCellId(id)
@@ -136,50 +147,6 @@ export function setFace(newFace)
 }
 
 
-export async function refreshNeiCells()
-{
-    neiCells.clear();
-
-    /*
-    var cell1 = new Array();
-    var cell2 = new Array();
-    var face1 = new Array();
-    var face2 = new Array();
-
-    await fetch("../database/getDoors.php")
-        .then(response => 
-        {
-            if (!response.ok) throw new Error ("Network error");
-            return response.json();
-        })
-        .then(data =>
-        {
-            console.log("passages: ", data);
-
-            // loop through result
-            for (let i = 0; i < data.length; i++)
-            {
-                cell1[i] = data[i].couloir1;
-                cell2[i] = data[i].couloir2;
-                face1[i] = data[i].position1;
-                face2[i] = data[i].position2;
-            }
-        })
-        .catch(error => console.error("Error: ", error));
-*/
-    for (let i = 0; i < cell1.length; i++)
-    {
-        // Cell isnt linked to player's
-        if (cell1[i] != playerCellId && cell2[i] != playerCellId)
-            continue;
-    
-        var playerOn1 = cell1[i] == playerCellId;
-        var currCell = playerOn1 ? cell2[i] : cell1[i];  // Other is player's cell
-        var newFace = playerOn1 ? face2[i] : face1[i];  // Where the next cell is
-            
-        neiCells.set(newFace, currCell);
-    }
-}
 
 
 export function setGifFrames(gifPath, frames)
@@ -215,4 +182,21 @@ export function setExitCell(exitCellId)
 export function setDoorOpened(isOpened)
 {
     doorOpened = isOpened;
+}
+
+export function setIdArr(newIdArr)
+{
+    IdArr = newIdArr;
+}
+
+
+export function setCellType(newCellType)
+{
+    cellType = newCellType;
+}
+
+
+export function setDoorCells(newDoorCells)
+{
+    doorCells = newDoorCells;
 }
