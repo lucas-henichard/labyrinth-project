@@ -1,3 +1,10 @@
+"""
+This script extracts frames from a GIF file and saves them as individual PNG images.
+It also creates a text file containing the total number of frames extracted.
+
+It's used to prepare the gifs and make them usable in js.
+"""
+
 from PIL import Image
 import os
 
