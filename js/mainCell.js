@@ -1,7 +1,7 @@
 import
-{ 
+{
     playerCellId, keyAmnt, cellType, fetchSql, setKeyAmnt,
-    setPlayerCellId, tknK , tknD, neiCells, setFace, face, score, exitCell,
+    setPlayerCellId, tknK , tknD, setFace, face, score, exitCell,
     setExitCell, IdArr, setScore, setIdArr, setCellType,
     setDoorCells
 } from "./mazeData.js";

@@ -30,15 +30,14 @@ export const cellColor =
     "undefined": "black"
 };
 
-
-// TODO: add image to start and exit cells + add bg music
 export const cellUrl = 
 {
     "undefined": "../res/images/wall.png",
     "grille": "../res/images/door.jpg",
     "vide": "../res/images/empty hallway.jpg",
     "cle": "../res/images/jerrycanHalo.jpg",
-    "sortie": "../res/images/exitDoor/frame_0.png"
+    "sortie": "../res/images/exitDoor/frame_0.png",
+    "depart": "../res/images/empty room.png"
 }
 
 
