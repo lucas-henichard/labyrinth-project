@@ -18,8 +18,8 @@ $neiCells = []; // face -> cellId
 while ($row = $result->fetchArray(SQLITE3_ASSOC))
 {
     $playerOn1 = ($row['couloir1'] == $playerCellId);
-    $currCell  = $playerOn1 ? $row['couloir2'] : $row['couloir1'];
-    $newFace   = $playerOn1 ? $row['position2'] : $row['position1'];
+    $currCell = $playerOn1 ? $row['couloir2'] : $row['couloir1'];
+    $newFace = $playerOn1 ? $row['position2'] : $row['position1'];
     $neiCells[$newFace] = $currCell;
 }
 

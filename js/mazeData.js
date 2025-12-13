@@ -45,8 +45,6 @@ export async function fetchSql()
 {
     if (!cellType || !IdArr)
     {
-        console.log("Fetching hallways data...");
-
         IdArr = new Array();
         cellType = new Array();
 
@@ -59,8 +57,6 @@ export async function fetchSql()
             })
             .then(data => 
             {
-                console.log("couloirs: ", data);
-                
                 // loop through result
                 for (let i = 0; i < data.length; i++)
                 {
@@ -74,8 +70,6 @@ export async function fetchSql()
 
     if (doorCells.size == 0 || !doorCells)
     {
-        console.log("Fetching closed doors data...");
-
         await fetch("../database/getClosedDoors.php")
             .then(response => 
             {
@@ -85,8 +79,6 @@ export async function fetchSql()
             })
             .then(data =>
             {
-                console.log("Grilles: ", data);
-
                 // loop through result
                 for (let i = 0; i < data.length; i++)
                 {
@@ -117,8 +109,6 @@ export async function refreshNeiCells()
         })
         .then(data =>
         {
-            console.log("Neighbors:", data);
-
             for (const face in data)
             {
                 neiCells.set(face, data[face]);

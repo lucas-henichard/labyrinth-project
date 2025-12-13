@@ -10,7 +10,7 @@
 
     $data = [];
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) 
-        {
+    {
         $data[] = $row;
     }
 

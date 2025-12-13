@@ -57,7 +57,6 @@ window.addEventListener('keydown', (event) =>
             break;
     }
 
-    console.log("should redraw: " + redraw);
     if (redraw)
         drawInFront(shouldOpenDoor);
 });
@@ -67,7 +66,6 @@ function movePlayer(direction)
 {
     if (!neiCells.has(direction))
     {
-        console.log("No cell in direction: " + direction);
         return false;
     }
 
@@ -80,7 +78,7 @@ function movePlayer(direction)
     }
     else
     {
-        setScore(score - score * movementFactor);
+        setScore(Math.floor(score - score * movementFactor));
     }
 
     const newCellId = neiCells.get(direction);
@@ -94,7 +92,6 @@ function movePlayer(direction)
             if (keyAmnt > 0)
             {
                 setKeyAmnt(keyAmnt - 1);
-                console.log("Used a key to open the door. Keys left: " + keyAmnt);
 
                 // Remove door (unlock)
                 doorCells.delete(playerCellId);
@@ -103,13 +100,8 @@ function movePlayer(direction)
             } 
             else  // Door is locked and no keys
             {
-                console.log("Door is locked! You need a key to open it.");
                 return false;
             }
-        } 
-        else  // Door already opened
-        {
-            console.log("Door already opened, passing through.");
         }
     }
     

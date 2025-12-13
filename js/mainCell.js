@@ -4,10 +4,9 @@ import
     setPlayerCellId, tknK , tknD, setFace, face, score, exitCell,
     setExitCell, IdArr, setScore, setIdArr, setCellType,
     setDoorCells,
-    neiCells
 } from "./mazeData.js";
 
-import { drawInFront, displayMsg } from "./rendering.js";
+import { drawInFront, displayMsg, displayHelp } from "./rendering.js";
 
 
 const RATIO = 16 / 9;
@@ -39,27 +38,19 @@ async function cell_onLoad()
 
     drawInFront();
 
+    if (cellType[playerCellId] == "depart")
+    {
+        displayHelp();
+    }
+
     if (cellType[playerCellId] == "cle")
     {
         if (!tknK.has(playerCellId))
         {
             setKeyAmnt(keyAmnt + 1);
             tknK.add(playerCellId);
-            
-            console.log("You found a key! You now have " + keyAmnt + " keys."); 
-            for (let i = 0; i < tknK.length; i++)
-            {
-                console.log("tknK" + i + ": " + tknK[i]);
-            }
-            console.log("tknK[0] " + tknK[0]);
-        }
-        else
-        {
-            console.log("You alr took this key earlier, you have " + keyAmnt + " keys.");
         }
     }
-
-    
 }
 
 
