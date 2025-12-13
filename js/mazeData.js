@@ -1,5 +1,6 @@
 import { getCellId } from "./mainCell.js";
 
+
 export const cellSize = 100;
 
 export var keyAmnt = 0;
@@ -145,8 +146,6 @@ export function setFace(newFace)
 {
     face = newFace;
 }
-
-
 
 
 export function setGifFrames(gifPath, frames)

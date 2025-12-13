@@ -5,8 +5,6 @@ import
     keyAmnt, setDoorOpened
 } from "./mazeData.js";
 
-// TODO: dynamically change canvas' size based on window size
-// TODO: when standing in front of exit door, show the key to press to open it (e) and before its pressed also display jojo menacing gif
 
 // Canvas setup
 const canvas = document.getElementById("cellCanvas");
@@ -162,10 +160,10 @@ function jumpScare()
 }
 
 
-export function displayMsg(message)
+export function displayMsg(message, x = 0, y = 0, textSizeDivisor = 32)
 {
-    textCtx.clearRect(0, 0, canvas.width, canvas.height);
-    textCtx.font = Math.round(textCanvas.height/32) + "px serif";
+    textCtx.clearRect(x, y, canvas.width, canvas.height);
+    textCtx.font = Math.round(textCanvas.height/textSizeDivisor) + "px serif";
     textCtx.fillStyle = "gray";
     textCtx.fillText(message, textCanvas.width/10, textCanvas.height - (9*textCanvas.height/10));
 }

@@ -128,7 +128,6 @@ function movePlayer(direction)
     localStorage.setItem("IdArr", IdArr.join(','));                                         // all cell ids
     localStorage.setItem("doorCells", JSON.stringify(Array.from(doorCells.entries())));     // door cells
 
-    
     window.location.href = "cell.php";
 
     return true;

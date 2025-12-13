@@ -6,7 +6,8 @@ import
     setDoorCells
 } from "./mazeData.js";
 
-import { drawInFront } from "./rendering.js";
+import { drawInFront, displayMsg } from "./rendering.js";
+
 
 const RATIO = 16 / 9;
 let canvas, ctx;
@@ -24,14 +25,18 @@ async function cell_onLoad()
     if (face == undefined)
         setFace("N");
     
-    drawInFront();
-    console.log("score: " + score);
-    
-    console.log("neiCells: ");
-    for (var elt of neiCells)
+    if (cellType[playerCellId] == "sortie")
     {
-            console.log(elt);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        displayMsg("You reached the exit! Your score is: " + score, canvas.width / 5, canvas.height / 2, 16);
+        return;
     }
+
+    drawInFront();
         
     if (cellType[playerCellId] == "cle")
     {
@@ -53,11 +58,7 @@ async function cell_onLoad()
         }
     }
 
-    if (cellType[playerCellId] == "sortie")
-    {
-        console.log("Your score is: " + score);
-        console.log("You reached the exit");  // TODO: show victory screen or smth similar
-    }
+    
 }
 
 
@@ -93,7 +94,7 @@ window.addEventListener('DOMContentLoaded', async () =>
 });
 
 
-function resizeCanvas(shouldRedraw = false)
+function resizeCanvas()
 {
     if (!canvas || !gifCanvas || !textCanvas)
         return;
@@ -122,15 +123,12 @@ function resizeCanvas(shouldRedraw = false)
     textCanvas.width  = width * dpr;
     textCanvas.height = height * dpr;
     textCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    if (shouldRedraw)
-        drawInFront();
 }
 
 
 window.addEventListener("resize", () =>
 {
-        resizeCanvas(true);
+        resizeCanvas();
 });
 
 
