@@ -62,6 +62,9 @@ export async function drawInFront(shouldOpenDoor = false)
     {
         drawImage("../res/images/chainsaw/frame_0.png", gifCanvas.width/4, gifCanvas.height/2, gifCanvas.width/2, gifCanvas.height/2, gifCtx);
     }
+    
+    if (neiCells.has("C"))
+        displayBackdoorMsg();
 }
 
 
@@ -163,7 +166,25 @@ function jumpScare()
 export function displayMsg(message, x = 0, y = 0, textSizeDivisor = 32)
 {
     textCtx.clearRect(x, y, canvas.width, canvas.height);
+
     textCtx.font = Math.round(textCanvas.height/textSizeDivisor) + "px serif";
-    textCtx.fillStyle = "gray";
+    
+    textCtx.strokeStyle = "#333333";
+    textCtx.lineWidth = 4;
+    textCtx.strokeText(message, textCanvas.width/10, textCanvas.height - (9*textCanvas.height/10));
+
+    textCtx.fillStyle = "#AAAAAA";
     textCtx.fillText(message, textCanvas.width/10, textCanvas.height - (9*textCanvas.height/10));
+}
+
+
+export function displayHelp()
+{
+    displayMsg("Controls: Z = forward, Q = turn left, D = turn right, R = reset game", 0, 0, 24);
+}
+
+
+export function displayBackdoorMsg()
+{
+    displayMsg("You found a backdoor, press space to go through it", 0, 0, 24);
 }

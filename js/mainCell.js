@@ -3,7 +3,8 @@ import
     playerCellId, keyAmnt, cellType, fetchSql, setKeyAmnt,
     setPlayerCellId, tknK , tknD, setFace, face, score, exitCell,
     setExitCell, IdArr, setScore, setIdArr, setCellType,
-    setDoorCells
+    setDoorCells,
+    neiCells
 } from "./mazeData.js";
 
 import { drawInFront, displayMsg } from "./rendering.js";
@@ -37,7 +38,7 @@ async function cell_onLoad()
     }
 
     drawInFront();
-        
+
     if (cellType[playerCellId] == "cle")
     {
         if (!tknK.has(playerCellId))

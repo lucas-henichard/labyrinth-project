@@ -5,7 +5,7 @@ import
     setScore, score, exitCell, doorOpened, IdArr,
 } from "./mazeData.js";
 
-import { drawInFront, displayMsg } from "./rendering.js";
+import { drawInFront, displayMsg, displayHelp } from "./rendering.js";
 
 
 const faces = ["O", "N", "E", "S"];
@@ -51,6 +51,9 @@ window.addEventListener('keydown', (event) =>
                 shouldOpenDoor = true;
             }
             redraw = true;
+            break;
+        case "t":
+            displayHelp();
             break;
     }
 
